@@ -1,31 +1,71 @@
 <#import "parts/common.ftlh" as c>
-<#import "parts/login.ftlh" as l>
 <@c.page>
-    <@l.logout />
-    <div>
-        <form method="post" action="/main">
-            <input type="hidden" name="_csrf" value="${_csrf.token}">
-            <input type="text" name="text" placeholder="Enter your message"/>
-            <input type="text" name="tag" placeholder="Tag"/>
-            <button type="submit">Add</button>
-        </form>
-    </div>
-    <div>
-        List of messages:
-    </div>
-    <form method="post" action="filter">
-        <input type="hidden" name="_csrf" value="${_csrf.token}">
-        <input type="text" name="filter" value="${filter!""}">
-        <button type="submit">Find</button>
+    <form class="row g-2" method="get" action="/main">
+        <div class="col-auto">
+            <label for="inputSearch" class="visually-hidden">Поиск</label>
+            <input type="text" class="form-control" id="inputSearch" name="filter" value="${filter!}"
+                   placeholder="Введите тэги для поиска">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary mb-3">Поиск</button>
+        </div>
     </form>
+
+    <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false"
+       aria-controls="collapseExample">
+        Добавить пост
+    </a>
+    <div class="collapse my-3" id="collapseExample">
+        <div class="card card-body">
+            <div class="form-group">
+                <form method="post" enctype="multipart/form-data">
+                    <div class="form-group  mt-3">
+                        <textarea cols="60" rows="5" class="form-control" name="text" placeholder="Введите ваше сообщение"></textarea>
+                    </div>
+                    <div class="form-group  mt-3">
+                        <input type="text" class="form-control" name="tag" placeholder="Tag"/>
+                    </div>
+                    <div class="form-group  mt-3">
+                        <div class="input-group">
+                            <input type="file" name="file" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Загрузка">
+                        </div>
+                    </div>
+                    <input type="hidden" name="_csrf" value="${_csrf.token}">
+                    <button type="submit" class="btn btn-primary  mt-3">Добавить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="mb-5">
     <#list messages as message>
-        <div>
+        <div class="card  text-center mb-3" style="width: 45rem;">
+            <#if message.filename??>
+            <img src="/img/${message.filename}" class="card-img-top">
+            </#if>
+            <div class="m-2">
+                <span>${message.text}</span>
+                <i>${message.tag}</i>
+            </div>
+            <div class="card-footer text-muted">
+    ${message.authorName}
+  </div>
+        </div>
+
+        <#--<div>
             <b>${message.id}</b>
             <span>${message.text}</span>
             <i>${message.tag}</i>
             <strong>${message.authorName}</strong>
-        </div>
+            <#if message.filename??>
+                <div>
+                    <img src="/img/${message.filename}">
+                </div>
+
+        </div>-->
     <#else>
         No messages
     </#list>
+    </div>
+
+
 </@c.page>
