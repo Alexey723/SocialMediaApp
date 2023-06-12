@@ -1,6 +1,8 @@
 package org.smaglyuk.socialmediaapp.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -12,14 +14,16 @@ import java.util.Set;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    private Integer id;
+    @NotBlank(message = "Имя пользователя не может быть пустым")
     private String username;
+    @NotBlank(message = "Пароль не может быть пустым")
     private String password;
     private boolean active;
+    @Email(message = "Email введен не верно (образец: example@example.ru)")
+    @NotBlank(message = "Email не может быть пустым")
     private String email;
     private String activationCode;
-    
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name="user_id"))
     @Enumerated(EnumType.STRING)
@@ -45,11 +49,11 @@ public class User implements UserDetails {
         this.activationCode = activationCode;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -84,6 +88,7 @@ public class User implements UserDetails {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

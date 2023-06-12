@@ -15,15 +15,26 @@
        aria-controls="collapseExample">
         Добавить пост
     </a>
-    <div class="collapse my-3" id="collapseExample">
+    <div class="collapse <#if message??>show</#if> my-3" id="collapseExample">
         <div class="card card-body">
             <div class="form-group">
                 <form method="post" enctype="multipart/form-data">
                     <div class="form-group  mt-3">
-                        <textarea cols="60" rows="5" class="form-control" name="text" placeholder="Введите ваше сообщение"></textarea>
+                        <textarea cols="60" rows="5" class="form-control ${(textError??)?string('is-invalid', '')}" value="<#if mesage??>${message.text}</#if>" name="text" placeholder="Введите ваше сообщение"></textarea>
+                        <#if textError??>
+                            <div class="invalid-feedback">
+                                ${textError}
+                            </div>
+                        </#if>
                     </div>
+
                     <div class="form-group  mt-3">
-                        <input type="text" class="form-control" name="tag" placeholder="Tag"/>
+                        <input type="text" class="form-control" value="<#if mesage??>${message.tag}</#if>" name="tag" placeholder="Tag"/>
+                        <#if textError??>
+                            <div class="invalid-feedback">
+                                ${textError}
+                            </div>
+                        </#if>
                     </div>
                     <div class="form-group  mt-3">
                         <div class="input-group">

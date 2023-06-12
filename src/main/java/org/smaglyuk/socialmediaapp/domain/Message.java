@@ -1,14 +1,19 @@
 package org.smaglyuk.socialmediaapp.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.Length;
 
 @Entity
+@Table(name = "message")
 public class Message {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
-    @Column(length = 5000)
+    private Integer id;
+    @NotBlank(message = "Поле не может быть пустым")
+    @Length(max=2048, message = "Размер сообщения превысил допустимое значение")
     private String text;
+    @Length(max=255, message = "Размер сообщения превысил допустимое значение")
     private String tag;
     private String filename;
     @ManyToOne(fetch = FetchType.EAGER)
@@ -43,11 +48,11 @@ public class Message {
         this.author = author;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

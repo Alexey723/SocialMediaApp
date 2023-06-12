@@ -1,5 +1,6 @@
 package org.smaglyuk.socialmediaapp.Controller;
 
+import jakarta.validation.Valid;
 import org.smaglyuk.socialmediaapp.Service.MessageService;
 import org.smaglyuk.socialmediaapp.domain.Message;
 import org.smaglyuk.socialmediaapp.domain.User;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -46,11 +49,16 @@ public class MainController {
     @PostMapping("/main")
     public String addMessage(
             @AuthenticationPrincipal User user,
-            @RequestParam String text,
-            @RequestParam String tag,
-            @RequestParam("file") MultipartFile file,
-            Model model) throws IOException {
-        Message message = new Message(text, tag, user);
+            @Valid Message message,
+            BindingResult bindingResult,
+            Model model,
+            @RequestParam("file") MultipartFile file) throws IOException {
+        message.setAuthor(user);
+        if(bindingResult.hasErrors()){
+            Map<String, String> errorMap = ControllerUtils.getErrors(bindingResult);
+            model.mergeAttributes(errorMap);
+            model.addAttribute("message", message);
+        } else {
         File uploadDir = new File(uploadPath);
         if(!uploadDir.exists()){
             uploadDir.mkdir();
@@ -61,7 +69,9 @@ public class MainController {
             message.setFilename(resultFileName);
         }
         file.transferTo(new File(uploadPath + "/" + resultFileName));
+            model.addAttribute("message", null);
         messageService.saveMessage(message);
+        }
         model.addAttribute("messages", messageService.getAllMsg());
     return "main";
     }
