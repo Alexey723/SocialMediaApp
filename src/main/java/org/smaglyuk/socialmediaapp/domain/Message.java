@@ -3,19 +3,30 @@ package org.smaglyuk.socialmediaapp.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
+import org.smaglyuk.socialmediaapp.domain.util.MessageHelper;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "message")
 public class Message {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Long id;
     @NotBlank(message = "Поле не может быть пустым")
     @Length(max=2048, message = "Размер сообщения превысил допустимое значение")
     private String text;
     @Length(max=255, message = "Размер сообщения превысил допустимое значение")
     private String tag;
     private String filename;
+    @ManyToMany
+    @JoinTable(
+            name = "message_likes",
+            joinColumns = { @JoinColumn(name = "message_id") },
+            inverseJoinColumns = { @JoinColumn(name = "user_id")}
+    )
+    private Set<User> likes = new HashSet<>();
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User author;
@@ -29,7 +40,7 @@ public class Message {
         this.author = user;
     }
     public String getAuthorName(){
-        return author != null ? author.getUsername() : "<none>";
+        return MessageHelper.getAuthorName(author);
     }
 
     public String getFilename() {
@@ -48,11 +59,11 @@ public class Message {
         this.author = author;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -72,4 +83,11 @@ public class Message {
         this.tag = tag;
     }
 
+    public Set<User> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Set<User> likes) {
+        this.likes = likes;
+    }
 }

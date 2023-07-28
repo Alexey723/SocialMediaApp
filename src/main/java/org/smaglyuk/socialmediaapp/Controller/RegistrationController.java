@@ -15,15 +15,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
 @Controller
 public class RegistrationController {
-    private final static String CAPTCHA_URL = "https://www.google.com/recaptcha/api/siteverify?secret=%s&response";
+    private final static String CAPTCHA_URL = "https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s";
     private final UserService userService;
-    @Value("recaptcha.secret")
+    @Value("${recaptcha.secret}")
     private String secret;
 
     private final RestTemplate restTemplate;
@@ -40,20 +39,23 @@ public class RegistrationController {
     @PostMapping("/registration")
     public String addUser(
             @RequestParam("password2") String passwordConfirm,
-            @RequestParam("g-recaptcha-response") String catchaResponse,
+            @RequestParam("g-recaptcha-response") String captchaResponse,
             @Valid User user,
             BindingResult bindingResult,
             Model model){
-        String url = String.format(CAPTCHA_URL, secret, catchaResponse);
+        String url = String.format(CAPTCHA_URL, secret, captchaResponse);
         CaptchaResponseDto response = restTemplate.postForObject(url, Collections.emptyList(), CaptchaResponseDto.class);
+
         if (!response.isSuccess()) {
-            model.addAttribute("captchaError", "Заполните CAPTCHA");
+            model.addAttribute("captchaError", "Проверка не пройдена");
         }
+
         boolean isConfirmEmpty = ObjectUtils.isEmpty(passwordConfirm);
+
         if(isConfirmEmpty){
             model.addAttribute("password2Error", "Подтверждающий пароль не может быть пустым");
         }
-        if(user.getPassword() != null && user.getPassword().equals(passwordConfirm)){
+        if(user.getPassword() != null && !user.getPassword().equals(passwordConfirm)){
             model.addAttribute("passwordError", "Пароль не может быть пустым");
         }
         if(isConfirmEmpty || bindingResult.hasErrors() || !response.isSuccess()){
@@ -62,7 +64,7 @@ public class RegistrationController {
             return "registration";
         }
         if(!userService.register(user)){
-            model.addAttribute("usernameError", "User exists");
+            model.addAttribute("usernameError", "Пользователь уже существует");
             return "registration";
         }
         userService.register(user);

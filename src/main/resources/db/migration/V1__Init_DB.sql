@@ -2,20 +2,20 @@ create sequence message_seq start with 1 increment by 50;
 create sequence usr_seq start with 1 increment by 50;
 create table message
 (
-    id       serial primary key,
-    user_id  serial,
+    id       int8 primary key,
+    user_id  int8,
     text     varchar(2048),
     filename varchar(255),
     tag      varchar(255)
 );
 create table user_role
 (
-    user_id serial not null,
+    user_id int8 not null,
     roles   varchar(255) check (roles in ('USER', 'ADMIN'))
 );
 create table usr
 (
-    id              serial primary key,
+    id              int8 primary key,
     active          boolean not null,
     activation_code varchar(255),
     email           varchar(255),

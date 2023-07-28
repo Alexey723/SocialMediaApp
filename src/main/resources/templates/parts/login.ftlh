@@ -69,7 +69,6 @@
 <#macro logout>
     <form action="/logout" method="post">
         <input type="hidden" name="_csrf" value="${_csrf.token}">
-        <remember-me key="myAppKey" />
         <button type="submit" class="btn btn-primary">Выйти</button>
     </form>
 </#macro>

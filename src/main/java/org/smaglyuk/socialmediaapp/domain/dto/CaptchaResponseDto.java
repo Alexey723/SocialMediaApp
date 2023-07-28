@@ -2,12 +2,17 @@ package org.smaglyuk.socialmediaapp.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CaptchaResponseDto {
+    @JsonProperty("success")
     private boolean success;
+
+    @JsonAlias("error-codes")
+    private Set<String> errorCode;
 
     public boolean isSuccess() {
         return success;
@@ -25,6 +30,4 @@ public class CaptchaResponseDto {
         this.errorCode = errorCode;
     }
 
-    @JsonAlias("error-codes")
-    private Set<String> errorCode;
 }
